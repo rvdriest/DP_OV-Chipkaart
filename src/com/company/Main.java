@@ -9,9 +9,12 @@ public class Main {
         String connectionUrl = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=W8wo0rd@01";
         try {
             Connection connection = DriverManager.getConnection(connectionUrl);
-            ReizigerDAOPsql reizigerDAO = new ReizigerDAOPsql(connection);
 
-            testReizigerDAO(reizigerDAO);
+            ReizigerDAO reizigerDAO = new ReizigerDAOPsql(connection);
+            AdresDAO adresDAO = new AdresDAOPsql(connection);
+
+//            testReizigerDAO(reizigerDAO);
+            testAdresDAO(adresDAO);
         }catch(SQLException sqlException) {
             System.err.println("[SQLException] Reizigers konden niet worden opgehaald: " + sqlException.getMessage());
         }
@@ -73,6 +76,50 @@ public class Main {
         rdao.update(reiziger);
         System.out.println(", na update is zijn de voorletters: " + rdao.findById(1).getVoorletters());
         System.out.println();
+    }
 
+    public static void testAdresDAO(AdresDAO adao) {
+        System.out.println("\n---------- Test AdresDAO -------------");
+
+        //findAll
+        System.out.println("Test findAll()");
+        adao.findAll().forEach(adres -> System.out.println(adres));
+
+        //save
+        System.out.println("\nTest save()");
+        Adres nieuweAdres = new Adres();
+        nieuweAdres.setId(6);
+        nieuweAdres.setHuisnummer("67");
+        nieuweAdres.setPostcode("3731XC");
+        nieuweAdres.setStraat("Aeolusweg");
+        nieuweAdres.setWoonplaats("De Bilt");
+        nieuweAdres.setReiziger(new Reiziger(77, "S", "", "Boers", Date.valueOf("1981-03-14")));
+        adao.save(nieuweAdres);
+        System.out.println("Alle adressen na het toevoegen:");
+        adao.findAll().forEach(adres -> System.out.println(adres));
+
+        //findByReiziger
+        System.out.println("\nTest findByReiziger()");
+        System.out.println(adao.findByReiziger(new Reiziger(77, "S", "", "Boers", Date.valueOf("1981-03-14"))));
+
+        //update
+        System.out.println("\nTest update()");
+        nieuweAdres.setHuisnummer("69");
+        adao.update(nieuweAdres);
+        System.out.println("Alle adressen na het updaten:");
+        adao.findAll().forEach(adres -> System.out.println(adres));
+
+        //delete
+        System.out.println("\nTest delete()");
+        nieuweAdres = new Adres();
+        nieuweAdres.setId(6);
+        nieuweAdres.setHuisnummer("69");
+        nieuweAdres.setPostcode("3731XC");
+        nieuweAdres.setStraat("Aeolusweg");
+        nieuweAdres.setWoonplaats("De Bilt");
+        nieuweAdres.setReiziger(new Reiziger(77, "S", "", "Boers", Date.valueOf("1981-03-14")));
+        adao.delete(nieuweAdres);
+        System.out.println("Alle adressen na het verwijderen:");
+        adao.findAll().forEach(adres -> System.out.println(adres));
     }
 }
