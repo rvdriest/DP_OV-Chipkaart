@@ -6,6 +6,7 @@ import java.util.List;
 
 public class ReizigerDAOPsql implements ReizigerDAO {
     private Connection connection;
+    private AdresDAO adresDAO;
 
     public ReizigerDAOPsql(Connection connection) {
         this.connection = connection;
@@ -22,7 +23,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             preparedStatement.setString(4, reiziger.getAchternaam());
             preparedStatement.setDate(5, reiziger.getGeboorteDatum());
             int resultSet = preparedStatement.executeUpdate();
-            isSuccess = true;
+            if(resultSet > 0) {
+                isSuccess = true;
+            }
+            preparedStatement.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Opslaan van reiziger niet geluklt: " + ex.getMessage());
         }
@@ -43,6 +47,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             if(result > 0) {
                 isSuccess = true;
             }
+            preparedStatement.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Opslaan van reiziger niet geluklt: " + ex.getMessage());
         }
@@ -59,6 +64,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             if(result > 0) {
                 isSuccess = true;
             }
+            preparedStatement.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Opslaan van reiziger niet geluklt: " + ex.getMessage());
         }
@@ -67,6 +73,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public Reiziger findById(int id) {
+        adresDAO = new AdresDAOPsql(connection);
         Reiziger reiziger = null;
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM reiziger WHERE reiziger_id=?;");
@@ -82,7 +89,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 Date geboorteDatum = resultSet.getDate("geboortedatum");
 
                 reiziger = new Reiziger(reizigerId, voorletters, tussenvoegsel, achternaam, geboorteDatum);
+                Adres adres = adresDAO.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
             }
+            preparedStatement.close();
+            resultSet.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Ophalen van alle reiziger is niet gelukt: " + ex.getMessage());
         }
@@ -91,6 +102,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public List<Reiziger> findByGbDatum(String datum) {
+        adresDAO = new AdresDAOPsql(connection);
         List<Reiziger> reizigers = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM reiziger WHERE geboortedatum=?;");
@@ -105,8 +117,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
                 Date geboorteDatum = resultSet.getDate("geboortedatum");
 
-                reizigers.add(new Reiziger(reizigerId, voorletters, tussenvoegsel, achternaam, geboorteDatum));
+                Reiziger reiziger = new Reiziger(reizigerId, voorletters, tussenvoegsel, achternaam, geboorteDatum);
+                Adres adres = adresDAO.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
+
+                reizigers.add(reiziger);
             }
+            preparedStatement.close();
+            resultSet.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Ophalen van alle reizigers is niet gelukt: " + ex.getMessage());
         }
@@ -115,6 +133,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public List<Reiziger> findAll() {
+        adresDAO = new AdresDAOPsql(connection);
         List<Reiziger> reizigers = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
@@ -128,8 +147,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
                 Date geboorteDatum = resultSet.getDate("geboortedatum");
 
-                reizigers.add(new Reiziger(reizigerId, voorletters, tussenvoegsel, achternaam, geboorteDatum));
+                Reiziger reiziger = new Reiziger(reizigerId, voorletters, tussenvoegsel, achternaam, geboorteDatum);
+                Adres adres = adresDAO.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
+
+                reizigers.add(reiziger);
             }
+            statement.close();
+            resultSet.close();
         }catch(SQLException ex) {
             System.err.println("[SQLException] Ophalen van alle reizigers is niet gelukt: " + ex.getMessage());
         }

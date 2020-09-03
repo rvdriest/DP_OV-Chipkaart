@@ -9,6 +9,8 @@ public class Reiziger {
     private String achternaam;
     private Date geboorteDatum;
 
+    private Adres adres;
+
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboorteDatum) {
         this.id = id;
         this.voorletters = voorletters;
@@ -37,34 +39,38 @@ public class Reiziger {
         return geboorteDatum;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    //om update() mee te testen
     public void setVoorletters(String voorletters) {
         this.voorletters = voorletters;
     }
 
-    public void setTussenvoegsel(String tussenvoegsel) {
-        this.tussenvoegsel = tussenvoegsel;
-    }
-
-    public void setAchternaam(String achternaam) {
-        this.achternaam = achternaam;
-    }
-
-    public void setGeboorteDatum(Date geboorteDatum) {
-        this.geboorteDatum = geboorteDatum;
+    public void setAdres(Adres adres) {
+        this.adres = adres;
     }
 
     @Override
     public String toString() {
-        return "Reiziger{" +
-                "id=" + id +
-                ", voorletters='" + voorletters + '\'' +
-                ", tussenvoegsel='" + tussenvoegsel + '\'' +
-                ", achternaam='" + achternaam + '\'' +
-                ", geboorteDatum=" + geboorteDatum +
-                '}';
+        String infoString = "";
+        if(adres != null) {
+            infoString = String.format("Reiziger {#%d %s. %s %s, geb. %s, Adres {#%d %s-%s}}   ",
+                    id,
+                    voorletters,
+                    tussenvoegsel == null ? "" : tussenvoegsel,
+                    achternaam,
+                    geboorteDatum.toString(),
+                    adres.getId(),
+                    adres.getPostcode(),
+                    adres.getHuisnummer()
+            );
+        }else {
+            infoString = String.format("Reiziger {#%d %s. %s %s, geb. %s, Adres null}   ",
+                    id,
+                    voorletters,
+                    tussenvoegsel == null ? "" : tussenvoegsel,
+                    achternaam,
+                    geboorteDatum.toString()
+            );
+        }
+        return infoString;
     }
 }
