@@ -56,12 +56,14 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public boolean delete(Reiziger reiziger) {
+        adresDAO = new AdresDAOPsql(connection);
         boolean isSuccess = false;
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM reiziger WHERE reiziger_id=?");
             preparedStatement.setInt(1, reiziger.getId());
             int result = preparedStatement.executeUpdate();
             if(result > 0) {
+                adresDAO.delete(adresDAO.findByReiziger(reiziger));
                 isSuccess = true;
             }
             preparedStatement.close();
