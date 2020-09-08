@@ -63,7 +63,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             preparedStatement.setInt(1, reiziger.getId());
             int result = preparedStatement.executeUpdate();
             if(result > 0) {
-                adresDAO.delete(adresDAO.findByReiziger(reiziger));
+                Adres adres = adresDAO.findByReiziger(reiziger);
+                if(adres != null) {
+                    adresDAO.delete(adres);
+                }
                 isSuccess = true;
             }
             preparedStatement.close();
