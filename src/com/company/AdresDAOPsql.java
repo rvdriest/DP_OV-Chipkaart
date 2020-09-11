@@ -13,6 +13,11 @@ public class AdresDAOPsql implements AdresDAO {
     }
 
     @Override
+    public void setReizigerDAO(ReizigerDAO reizigerDAO) {
+        this.reizigerDAO = reizigerDAO;
+    }
+
+    @Override
     public boolean save(Adres adres) {
         boolean isSuccess = false;
         try {
@@ -102,7 +107,6 @@ public class AdresDAOPsql implements AdresDAO {
 
     @Override
     public List<Adres> findAll() {
-        reizigerDAO = new ReizigerDAOPsql(connection);
         List<Adres> adressen = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();

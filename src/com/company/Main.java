@@ -8,9 +8,16 @@ public class Main {
     public static void main(String[] args) {
             ReizigerDAO reizigerDAO = new ReizigerDAOPsql(connection);
             AdresDAO adresDAO = new AdresDAOPsql(connection);
+            OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOPsql(connection);
+
+            reizigerDAO.setAdresDAO(adresDAO);
+            adresDAO.setReizigerDAO(reizigerDAO);
+            ovChipkaartDAO.setReizigerDAO(reizigerDAO);
+            reizigerDAO.setOVChipkaartDAO(ovChipkaartDAO);
 
             testReizigerDAO(reizigerDAO);
-//            testAdresDAO(adresDAO);
+            testAdresDAO(adresDAO);
+            testOVChipkaartDAO(ovChipkaartDAO);
 
             closeConnection();
     }
@@ -61,18 +68,18 @@ public class Main {
         System.out.println(reizigers.size() + " reizigers");
         rdao.findAll().forEach(reiziger -> System.out.println(reiziger));
 
-        // Haal reiziger op met id 2
+//        // Haal reiziger op met id 2
         int reizigerId = 2;
         System.out.println(String.format("\n[Test] Gebruiker met id %d: ", reizigerId));
         System.out.println(rdao.findById(reizigerId) + "\n");
 
-        // Haal reizigers op met 2002-12-03 als geboortedatum
+//        // Haal reizigers op met 2002-12-03 als geboortedatum
         String geboorteDatum = "2002-12-03";
         reizigers = rdao.findByGbDatum(geboorteDatum);
         System.out.println(String.format("\n[Test] Alle gebruikers met als geboortedatum %s: ", geboorteDatum));
         reizigers.forEach(reiziger -> System.out.println(reiziger));
 
-        // Verwijder gebruiker met id 77
+//         Verwijder gebruiker met id 77
         System.out.print("\n[Test] Eerst " + rdao.findAll().size() + " reizigers, ");
         rdao.delete(rdao.findById(77));
         System.out.println("na verwijderen van gebruiker: " + rdao.findAll().size());
@@ -81,7 +88,7 @@ public class Main {
         Reiziger reiziger = rdao.findById(1);
         System.out.print("\n[Test] Voorletter is eerst " + reiziger.getVoorletters());
         reiziger.setVoorletters("R");
-        rdao.update(reiziger);
+        System.out.println(rdao.update(reiziger));;
         System.out.println(", na update is zijn de voorletters: " + rdao.findById(1).getVoorletters());
     }
 
@@ -121,5 +128,46 @@ public class Main {
         adao.delete(nieuweAdres);
         System.out.println("Alle adressen na het verwijderen:");
         adao.findAll().forEach(adres -> System.out.println(adres));
+    }
+
+    public static void testOVChipkaartDAO(OVChipkaartDAO odao) {
+        Reiziger reiziger = new Reiziger(77, "S", null, "Boers", java.sql.Date.valueOf("1981-03-14"));
+        OVChipkaart ovChipkaart = new OVChipkaart(
+                8,
+                Date.valueOf("2020-12-01"),
+                1,
+                21.00,
+                reiziger
+        );
+        System.out.println("\n---------- Test OVChipkaartDAO -------------");
+
+        //save
+        System.out.println("\n[Test] save()");
+        System.out.print("Eerst " + odao.findAll().size() + " reizigers, na ReizigerDAO.save() ");
+        odao.save(ovChipkaart);
+        System.out.println(odao.findAll().size() + " reizigers");
+
+        //update
+        System.out.println("\n[Test] update()");
+        System.out.println("Voor update: ");
+        odao.findByReiziger(reiziger).forEach(kaart -> System.out.println(kaart));
+        ovChipkaart.setSaldo(10.00);
+        odao.update(ovChipkaart);
+        System.out.println("Na update: ");
+        odao.findByReiziger(reiziger).forEach(kaart -> System.out.println(kaart));
+
+        //findByReiziger
+        System.out.println("\n[Test] findByReiziger()");
+        odao.findByReiziger(reiziger).forEach(kaart -> System.out.println(kaart));
+
+        //delete
+        System.out.println("\n[Test] delete()");
+        System.out.print("Eerst " + odao.findAll().size() + " kaarten, ");
+        odao.delete(ovChipkaart);
+        System.out.println("na verwijderen van OV Chipkaart: " + odao.findAll().size());
+
+        //findAll
+        System.out.println("\n[Test] FindAll()");
+        odao.findAll().forEach(kaart -> System.out.println(kaart));
     }
 }
