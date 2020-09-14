@@ -63,6 +63,8 @@ public class Reiziger {
 
     public void setOvChipkaarten(List<OVChipkaart> ovChipkaarten) { this.ovChipkaarten = ovChipkaarten; };
 
+    public void removeOvChipkaart(OVChipkaart ovChipkaart) { ovChipkaarten.remove(ovChipkaart); }
+
     public List<OVChipkaart> getOvChipkaarten() {
         return ovChipkaarten;
     }

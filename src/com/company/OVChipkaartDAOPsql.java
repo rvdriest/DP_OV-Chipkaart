@@ -68,6 +68,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
             preparedStatement.setInt(1, ovChipkaart.getKaartnummer());
             int result = preparedStatement.executeUpdate();
             if(result > 0) {
+                ovChipkaart.getReiziger().removeOvChipkaart(ovChipkaart);
                 isSuccess = true;
             }
             preparedStatement.close();

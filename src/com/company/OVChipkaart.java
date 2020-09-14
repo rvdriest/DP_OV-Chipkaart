@@ -1,6 +1,8 @@
 package com.company;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OVChipkaart {
     private int kaartnummer;
@@ -8,6 +10,7 @@ public class OVChipkaart {
     private int klasse;
     private double saldo;
     private Reiziger reiziger;
+//    private List<Product> producten;
 
     public OVChipkaart(int kaartnummer, Date geldigTot, int klasse, double saldo, Reiziger reiziger) {
         this.kaartnummer = kaartnummer;
@@ -16,6 +19,7 @@ public class OVChipkaart {
         this.saldo = saldo;
         this.reiziger = reiziger;
         reiziger.addOVChipkaart(this);
+//        producten = new ArrayList<>();
     }
 
     public int getKaartnummer() {
@@ -38,9 +42,21 @@ public class OVChipkaart {
         return reiziger;
     }
 
+//    public List<Product> getProducten() {
+//        return producten;
+//    }
+
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
+
+//    public void voegProductToe(Product product) {
+//        this.producten.add(product);
+//    }
+//
+//    public void verwijderProduct(Product product) {
+//        this.producten.remove(product);
+//    }
 
     @Override
     public String toString() {

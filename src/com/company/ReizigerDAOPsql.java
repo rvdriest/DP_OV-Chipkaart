@@ -36,7 +36,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             int resultSet = preparedStatement.executeUpdate();
             if(resultSet > 0) {
                 if(reiziger.getAdres() != null) {
-                    adresDAO.save(reiziger.getAdres());
+                    if(adresDAO.findByReiziger(reiziger) == null) {
+                        adresDAO.save(reiziger.getAdres());
+                    }else {
+                        adresDAO.update(reiziger.getAdres());
+                    }
                 }
                 if(reiziger.getOvChipkaarten().size() > 0) {
                     reiziger.getOvChipkaarten().forEach(ovChipkaart -> ovChipkaartDAO.save(ovChipkaart));
@@ -62,17 +66,19 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             preparedStatement.setInt(5, reiziger.getId());
             int result = preparedStatement.executeUpdate();
 
-            Adres adres = reiziger.getAdres();
             boolean isAdresUpdated = false;
-            if(adres != null) {
-                isAdresUpdated = adresDAO.update(reiziger.getAdres());
+            if(reiziger.getAdres() != null) {
+                if(adresDAO.findByReiziger(reiziger) == null) {
+                    isAdresUpdated = adresDAO.save(reiziger.getAdres());
+                }else {
+                    isAdresUpdated = adresDAO.update(reiziger.getAdres());
+                }
             }
 
             boolean isOVChipkaartUpdated = false;
             for(OVChipkaart ovChipkaart : reiziger.getOvChipkaarten()) {
                 if(ovChipkaartDAO.update(ovChipkaart)) isOVChipkaartUpdated = true;
             }
-
             if(result > 0 || isAdresUpdated || isOVChipkaartUpdated) {
                 isSuccess = true;
             }

@@ -26,7 +26,7 @@ public class Main {
     private static Connection getConnection() {
         Connection newConnection = null;
         try {
-            String connectionUrl = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=123456";
+            String connectionUrl = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=W8wo0rd@01";
             newConnection = DriverManager.getConnection(connectionUrl);
         }catch(SQLException sqlException) {
             System.err.println("[SQLException] Verbinden met database is mislukt: " + sqlException.getMessage());
