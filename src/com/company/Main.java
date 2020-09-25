@@ -9,16 +9,19 @@ public class Main {
             ReizigerDAO reizigerDAO = new ReizigerDAOPsql(connection);
             AdresDAO adresDAO = new AdresDAOPsql(connection);
             OVChipkaartDAO ovChipkaartDAO = new OVChipkaartDAOPsql(connection);
+            ProductDAO productDAO = new ProductDAOPsql(connection);
 
             reizigerDAO.setAdresDAO(adresDAO);
             adresDAO.setReizigerDAO(reizigerDAO);
             ovChipkaartDAO.setReizigerDAO(reizigerDAO);
+            ovChipkaartDAO.setProductDAO(productDAO);
             reizigerDAO.setOVChipkaartDAO(ovChipkaartDAO);
+            productDAO.setOVChipkaartDAO(ovChipkaartDAO);
 
-            testReizigerDAO(reizigerDAO);
-            testAdresDAO(adresDAO);
-            testOVChipkaartDAO(ovChipkaartDAO);
-
+//            testReizigerDAO(reizigerDAO);
+//            testAdresDAO(adresDAO);
+            testOVChipkaartDAO(ovChipkaartDAO, reizigerDAO, productDAO);
+//            testProductDAO(productDAO, ovChipkaartDAO);
             closeConnection();
     }
 
@@ -26,7 +29,7 @@ public class Main {
     private static Connection getConnection() {
         Connection newConnection = null;
         try {
-            String connectionUrl = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=W8wo0rd@01";
+            String connectionUrl = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=123456";
             newConnection = DriverManager.getConnection(connectionUrl);
         }catch(SQLException sqlException) {
             System.err.println("[SQLException] Verbinden met database is mislukt: " + sqlException.getMessage());
@@ -130,8 +133,8 @@ public class Main {
         adao.findAll().forEach(adres -> System.out.println(adres));
     }
 
-    public static void testOVChipkaartDAO(OVChipkaartDAO odao) {
-        Reiziger reiziger = new Reiziger(77, "S", null, "Boers", java.sql.Date.valueOf("1981-03-14"));
+    public static void testOVChipkaartDAO(OVChipkaartDAO odao, ReizigerDAO rdao, ProductDAO pdao) {
+        Reiziger reiziger = rdao.findById(2);
         OVChipkaart ovChipkaart = new OVChipkaart(
                 8,
                 Date.valueOf("2020-12-01"),
@@ -169,5 +172,40 @@ public class Main {
         //findAll
         System.out.println("\n[Test] FindAll()");
         odao.findAll().forEach(kaart -> System.out.println(kaart));
+
+        System.out.println("\n[Test] FindByProdduct()");
+        odao.findByProduct(pdao.findAll().get(0)).forEach(kaart -> System.out.println(kaart));
+    }
+
+    public static void testProductDAO(ProductDAO pdao, OVChipkaartDAO odao) {
+        System.out.println("\n---------- Test ProductDAO -------------");
+
+        System.out.println("\n[Test] findByOvchipkaart");
+        pdao.findByOVChipkaart(odao.findAll().get(3)).forEach(product -> System.out.println(product));
+
+        System.out.println("\n[Test] findAll");
+        pdao.findAll().forEach(product -> System.out.println(product));
+
+        System.out.println("\n[Test] Save");
+        Product product = new Product(7, "Koningsdag", "Voordelig reizen op koningsdag", 20.00);
+        product.voegOvChipkaartToe(odao.findAll().get(1));
+        System.out.println("Voor de save: " + pdao.findAll().size());
+        pdao.save(product);
+        System.out.println("Na de save: " + pdao.findAll().size());
+
+        System.out.println("\n[Test] Update");
+        product.setPrijs(10.00);
+        product.verwijderOvChipkaart(product.getOvChipkaarten().get(0));
+//        product.voegOvChipkaartToe(product.);
+        System.out.println("Voor de update: ");
+        pdao.findAll().forEach(prod -> System.out.println(prod));
+        pdao.update(product);
+        System.out.println("Na de update: ");
+        pdao.findAll().forEach(prod -> System.out.println(prod));
+
+        System.out.println("\n[Test] Delete");
+        System.out.println("Voor update: " + pdao.findAll().size());
+        pdao.delete(product);
+        System.out.println("Na update: " + pdao.findAll().size());
     }
 }

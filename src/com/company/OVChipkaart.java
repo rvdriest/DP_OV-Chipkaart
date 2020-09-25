@@ -10,7 +10,7 @@ public class OVChipkaart {
     private int klasse;
     private double saldo;
     private Reiziger reiziger;
-//    private List<Product> producten;
+    private List<Product> producten;
 
     public OVChipkaart(int kaartnummer, Date geldigTot, int klasse, double saldo, Reiziger reiziger) {
         this.kaartnummer = kaartnummer;
@@ -19,7 +19,7 @@ public class OVChipkaart {
         this.saldo = saldo;
         this.reiziger = reiziger;
         reiziger.addOVChipkaart(this);
-//        producten = new ArrayList<>();
+        producten = new ArrayList<>();
     }
 
     public int getKaartnummer() {
@@ -42,25 +42,27 @@ public class OVChipkaart {
         return reiziger;
     }
 
-//    public List<Product> getProducten() {
-//        return producten;
-//    }
+    public List<Product> getProducten() {
+        return producten;
+    }
 
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
 
-//    public void voegProductToe(Product product) {
-//        this.producten.add(product);
-//    }
-//
-//    public void verwijderProduct(Product product) {
-//        this.producten.remove(product);
-//    }
+    public void voegProductToe(Product product) {
+        this.producten.add(product);
+        product.voegOvChipkaartToe(this);
+    }
+
+    public void verwijderProduct(Product product) {
+        this.producten.remove(product);
+        product.verwijderOvChipkaart(this);
+    }
 
     @Override
     public String toString() {
-        return String.format("OVChipkaart {#%d Geldig tot: %s, Saldo: %.2f, Klasse: %d, Reiziger {#%d %s. %s %s, geb. %s}}",
+        String infoString = String.format("OVChipkaart {#%d Geldig tot: %s, Saldo: %.2f, Klasse: %d, Reiziger {#%d %s. %s %s, geb. %s}}",
                 kaartnummer,
                 geldigTot,
                 saldo,
@@ -70,5 +72,13 @@ public class OVChipkaart {
                 reiziger.getTussenvoegsel() == null ? "" : reiziger.getTussenvoegsel(),
                 reiziger.getAchternaam(),
                 reiziger.getGeboorteDatum()).replace("  ", " ");
+        for(Product product : this.producten) {
+            infoString += String.format("\n  Product {#%d, naam: %s, beschrijving: %s, prijs: %.2f}",
+                    product.getNummer(),
+                    product.getNaam(),
+                    product.getBeschrijving(),
+                    product.getPrijs());
+        }
+        return infoString;
     }
 }
